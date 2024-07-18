@@ -10,7 +10,7 @@ const App = () => {
   return (
     <SafeAreaView className=" bg-primary h-full">
       <ScrollView contentContainerStyle={{ height: "101%" }}>
-        <View className=" w-full justify-center items-center min-h-[90dvh] py-3 px-4">
+        <View className=" w-full justify-center items-center min-h-[90vh] py-3 px-4">
           <Image
             source={images.logo}
             className=" w-[130px] h-[84px]"
