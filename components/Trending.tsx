@@ -1,6 +1,4 @@
 import {
-  View,
-  Text,
   FlatList,
   TouchableOpacity,
   ImageBackground,
@@ -14,7 +12,7 @@ import * as Animatable from "react-native-animatable";
 import { Video, ResizeMode } from "expo-av";
 
 const ZoomIn = { 0: { scale: 0.9 }, 1: { scale: 1 } };
-const ZoomOut = { 0: { scale: 1 }, 1: { scale: 0.9 } };
+const ZoomOut = { 0: { scale: 1.1 }, 1: { scale: 0.9 } };
 
 const TrendingItem = ({
   post,
@@ -36,7 +34,7 @@ const TrendingItem = ({
       {play ? (
         <Video
           source={{ uri: post.videoUrl }}
-          className=" w-52 h-72 rounded-3xl mt-3 bg-white/10"
+          className="w-52 h-72 rounded-3xl mt-3 bg-white/102"
           resizeMode={ResizeMode.CONTAIN}
           useNativeControls
           onPlaybackStatusUpdate={({ isLoaded }) => {

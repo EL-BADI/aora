@@ -2,6 +2,7 @@ import { View, Text, Image, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import { VideoType } from "..";
 import { icons } from "@/constants";
+import { ResizeMode, Video } from "expo-av";
 
 const VidCard = ({ vid }: { vid: VideoType }) => {
   const [play, setPlay] = useState(false);
@@ -41,7 +42,20 @@ const VidCard = ({ vid }: { vid: VideoType }) => {
         </View>
       </View>
       {play ? (
-        <Text className=" text-white">Playing...</Text>
+        <Video
+          source={{ uri: vid.videoUrl }}
+          className=" w-full h-60 rounded-3xl mt-3"
+          resizeMode={ResizeMode.CONTAIN}
+          useNativeControls
+          onPlaybackStatusUpdate={({ isLoaded }) => {
+            if (!isLoaded) {
+              console.log("NOT loaded");
+            } else {
+              console.log("loaded");
+            }
+          }}
+          shouldPlay
+        />
       ) : (
         <TouchableOpacity
           activeOpacity={0.7}

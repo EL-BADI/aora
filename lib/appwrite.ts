@@ -165,3 +165,36 @@ export const getLatestPosts = async (): Promise<VideoType[]> => {
     }
   }
 };
+export const searchPosts = async ({
+  query,
+}: {
+  query: string;
+}): Promise<VideoType[]> => {
+  console.log(query);
+
+  try {
+    const posts = await dbs.listDocuments(
+      config.databaseId,
+      config.videoCollectionId,
+      [Query.search("title", query)]
+    );
+
+    const videoPosts: VideoType[] = posts.documents.map((doc: any) => ({
+      $id: doc.$id,
+      title: doc.title,
+      thembnail: doc.thembnail,
+      creator: doc.creator as UserType,
+      prompt: doc.prompt,
+      videoUrl: doc.video,
+    }));
+
+    return videoPosts;
+  } catch (error) {
+    console.log(error);
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("An unknown error occurred");
+    }
+  }
+};
