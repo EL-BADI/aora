@@ -6,6 +6,7 @@ import {
   ID,
   Query,
 } from "react-native-appwrite";
+import { UserType, VideoType } from "..";
 // Init your React Native SDK
 const client = new Client();
 
@@ -102,6 +103,59 @@ export const getCurrentUser = async () => {
     if (!currentUser) throw Error;
 
     return currentUser.documents[0];
+  } catch (error) {
+    console.log(error);
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("An unknown error occurred");
+    }
+  }
+};
+export const getAllPosts = async (): Promise<VideoType[]> => {
+  try {
+    const posts = await dbs.listDocuments(
+      config.databaseId,
+      config.videoCollectionId
+    );
+
+    const videoPosts: VideoType[] = posts.documents.map((doc: any) => ({
+      $id: doc.$id,
+      title: doc.title,
+      thembnail: doc.thembnail,
+      creator: doc.creator as UserType,
+      prompt: doc.prompt,
+      videoUrl: doc.video,
+    }));
+
+    return videoPosts;
+  } catch (error) {
+    console.log(error);
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("An unknown error occurred");
+    }
+  }
+};
+export const getLatestPosts = async (): Promise<VideoType[]> => {
+  try {
+    const posts = await dbs.listDocuments(
+      config.databaseId,
+      config.videoCollectionId,
+      [Query.orderDesc("$createdAt"), Query.limit(7)]
+    );
+
+    const videoPosts: VideoType[] = posts.documents.map((doc: any) => ({
+      $id: doc.$id,
+      title: doc.title,
+      thembnail: doc.thembnail,
+      creator: doc.creator as UserType,
+      prompt: doc.prompt,
+      videoUrl: doc.video,
+    }));
+
+    return videoPosts;
   } catch (error) {
     console.log(error);
     if (error instanceof Error) {
