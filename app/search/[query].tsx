@@ -1,5 +1,4 @@
 import { View, Text, FlatList, ActivityIndicator } from "react-native";
-import React, { useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { VideoType } from "@/index";
 import SearchInput from "@/components/SearchInput";

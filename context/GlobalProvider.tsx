@@ -8,12 +8,13 @@ import {
   useEffect,
 } from "react";
 import { Models } from "react-native-appwrite";
+import { UserType } from "..";
 
 interface GlobalContextProps {
   isLoggedIn: boolean;
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
   // @ts-ignore
-  user: Models.User | null;
+  user: UserType | null;
   // @ts-ignore
   setUser: React.Dispatch<React.SetStateAction<Models.User | null>>;
   isLoading: boolean;
@@ -30,7 +31,7 @@ export const useGlobalContext = () => {
 
 const GlobalProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState<Document | null>(null);
+  const [user, setUser] = useState<UserType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {

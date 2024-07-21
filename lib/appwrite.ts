@@ -198,3 +198,52 @@ export const searchPosts = async ({
     }
   }
 };
+
+export const getUserPosts = async ({
+  userId,
+}: {
+  userId: string;
+}): Promise<VideoType[]> => {
+  console.log(userId);
+
+  try {
+    const posts = await dbs.listDocuments(
+      config.databaseId,
+      config.videoCollectionId,
+      [Query.equal("creator", userId)]
+    );
+
+    const videoPosts: VideoType[] = posts.documents.map((doc: any) => ({
+      $id: doc.$id,
+      title: doc.title,
+      thembnail: doc.thembnail,
+      creator: doc.creator as UserType,
+      prompt: doc.prompt,
+      videoUrl: doc.video,
+    }));
+
+    return videoPosts;
+  } catch (error) {
+    console.log(error);
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("An unknown error occurred");
+    }
+  }
+};
+
+export async function signOut() {
+  try {
+    const session = await account.deleteSession("current");
+
+    return session;
+  } catch (error) {
+    console.log(error);
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("An unknown error occurred");
+    }
+  }
+}
