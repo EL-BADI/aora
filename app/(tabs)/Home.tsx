@@ -16,8 +16,10 @@ import EmptyState from "@/components/EmptyState";
 import { getAllPosts, getLatestPosts } from "@/lib/appwrite";
 import { useQuery } from "@tanstack/react-query";
 import VidCard from "@/components/VidCard";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 const Home = () => {
+  const { user } = useGlobalContext();
   const {
     data: posts,
     isLoading,
@@ -56,10 +58,10 @@ const Home = () => {
             <View className=" justify-between items-start flex-row mb-6">
               <View>
                 <Text className=" font-pmedium text-sm text-zinc-200">
-                  Welcome Back
+                  Welcome back,
                 </Text>
                 <Text className=" text-2xl font-psemibold text-white">
-                  El badi
+                  {user?.username}
                 </Text>
               </View>
               <View className=" mt-1.5">
@@ -88,7 +90,12 @@ const Home = () => {
           />
         )}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            className=""
+            tintColor="#FFFFFF"
+          />
         }
       />
     </SafeAreaView>

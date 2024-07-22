@@ -11,10 +11,13 @@ import { images } from "@/constants";
 import FormField from "@/components/FormField";
 import CustomButton from "@/components/CustomButton";
 import { Link, router } from "expo-router";
-import { signIn } from "@/lib/appwrite";
+import { getCurrentUser, signIn } from "@/lib/appwrite";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 const SingIn = () => {
   const [form, setForm] = useState({ email: "", password: "" });
+
+  const { setUser, setIsLoggedIn } = useGlobalContext();
 
   const [isSubmiting, setIsSubmitting] = useState(false);
 
@@ -35,6 +38,21 @@ const SingIn = () => {
       console.log({ session });
 
       // set it to global state...
+
+      getCurrentUser()
+        .then((res) => {
+          if (res) {
+            console.log({ res });
+
+            setIsLoggedIn(true);
+            // @ts-ignore
+            setUser(res);
+          } else {
+            setIsLoggedIn(false);
+            setUser(null);
+          }
+        })
+        .catch((error) => console.log(error));
 
       router.replace("/Home");
     } catch (error: unknown) {
