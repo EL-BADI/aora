@@ -4,9 +4,13 @@ import {
   Client,
   Databases,
   ID,
+  ImageGravity,
   Query,
+  Storage,
 } from "react-native-appwrite";
 import { UserType, VideoType } from "..";
+import { formDataProps } from "@/app/(tabs)/Create";
+import { ImagePickerAsset } from "expo-image-picker";
 // Init your React Native SDK
 const client = new Client();
 
@@ -30,6 +34,7 @@ client
 const account = new Account(client);
 const avatars = new Avatars(client);
 const dbs = new Databases(client);
+const storage = new Storage(client);
 
 export const createUser = async ({
   email,
@@ -238,6 +243,119 @@ export async function signOut() {
     const session = await account.deleteSession("current");
 
     return session;
+  } catch (error) {
+    console.log(error);
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("An unknown error occurred");
+    }
+  }
+}
+
+// ///////
+
+// Get File Preview
+export async function getFilePreview({
+  fileId,
+  type,
+}: {
+  fileId: string;
+  type: "image" | "video";
+}) {
+  let fileUrl;
+
+  try {
+    if (type === "video") {
+      fileUrl = storage.getFileView(config.storageId, fileId);
+    } else if (type === "image") {
+      fileUrl = storage.getFilePreview(
+        config.storageId,
+        fileId,
+        2000,
+        2000,
+        ImageGravity.Top,
+        100
+      );
+    } else {
+      throw new Error("Invalid file type");
+    }
+
+    if (!fileUrl) throw Error;
+
+    return fileUrl;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("An unknown error occurred");
+    }
+  }
+}
+
+export async function uploadFile({
+  file,
+  type,
+}: {
+  file: ImagePickerAsset | null;
+  type: "image" | "video";
+}) {
+  try {
+    if (!file) throw new Error("Missing file!");
+    const { mimeType, fileName, fileSize, uri } = file;
+    const asset = {
+      type: mimeType as string,
+      name: fileName as string,
+      size: fileSize as number,
+      uri,
+    };
+
+    const uploadedFile = await storage.createFile(
+      config.storageId,
+      ID.unique(),
+      asset
+    );
+
+    console.log({ uploadedFile });
+
+    const fileUrl = await getFilePreview({ fileId: uploadedFile.$id, type });
+    return fileUrl;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("An unknown error occurred");
+    }
+  }
+}
+
+export async function createPost({
+  form,
+  userId,
+}: {
+  form: formDataProps;
+  userId: string;
+}) {
+  try {
+    const [thembnailUrl, vidUrl] = await Promise.all([
+      uploadFile({ file: form.thembnail, type: "image" }),
+      uploadFile({ file: form.video, type: "video" }),
+    ]);
+
+    const newPost = await dbs.createDocument(
+      config.databaseId,
+      config.videoCollectionId,
+      ID.unique(),
+      {
+        title: form.title,
+        thembnail: thembnailUrl,
+        video: vidUrl,
+        prompt: form.prompt,
+        creator: userId,
+      }
+    );
+
+    return newPost;
   } catch (error) {
     console.log(error);
     if (error instanceof Error) {
